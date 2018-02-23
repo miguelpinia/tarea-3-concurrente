@@ -111,10 +111,23 @@ public class ArbolAleatorio1 {
         return inorden(_raiz, 0);
     }
 
+    public Integer[] generaDatos() {
+        Integer[] datos = new Integer[100];
+        Random r = new Random();
+        for (int i = 0; i < 100; i++) {
+            datos[i] = r.nextInt(1000000);
+        }
+        return datos;
+    }
+
     public static void main(String[] args) {
         Integer[] foo = {10, 20, 30, 50, 1, 2, 3, 4, 100, 200, 300, 400};
         ArbolAleatorio1 a = new ArbolAleatorio1();
-        for (Integer val : foo) {
+        Integer[] datos = a.generaDatos();
+        for (int i = 0; i < datos.length; i++) {
+            System.out.print(datos[i] + " ");
+        }
+        for (Integer val : foo) { // Intercambiar foo por datos
             a.agrega(val);
         }
         System.out.println(a);
