@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package concurrente;
+package concurrente.aleatorio;
 
+import concurrente.Nodo;
 import java.util.Collections;
 import java.util.Random;
 
@@ -15,44 +11,6 @@ import java.util.Random;
 public class ArbolAleatorio1 {
 
     Nodo _raiz;
-
-    class Nodo {
-
-        private Nodo _izq, _der;
-        private final Integer _valor;
-
-        public Nodo(Integer valor) {
-            _valor = valor;
-            _der = null;
-            _izq = null;
-        }
-
-        public Nodo(Integer valor, Nodo der, Nodo izq) {
-            _valor = valor;
-            _der = der;
-            _izq = izq;
-        }
-
-        public Integer getValor() {
-            return _valor;
-        }
-
-        public Nodo getIzquierdo() {
-            return _izq;
-        }
-
-        public Nodo getDerecho() {
-            return _der;
-        }
-
-        public void setIzquierdo(Nodo izq) {
-            _izq = izq;
-        }
-
-        public void setDerecho(Nodo der) {
-            _der = der;
-        }
-    }
 
     public ArbolAleatorio1() {
         _raiz = null;
@@ -65,7 +23,6 @@ public class ArbolAleatorio1 {
     public Nodo _agrega(Nodo nodo, Integer valor, int profundidad) {
         Random r = new Random();
         if (nodo == null) {
-//            System.out.println("a");
             nodo = new Nodo(valor);
             return nodo;
         }
