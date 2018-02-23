@@ -59,10 +59,10 @@ public class ArbolAleatorio1 {
     }
 
     public void agrega(Integer valor) {
-        _raiz = _agrega(_raiz, valor);
+        _raiz = _agrega(_raiz, valor, 0);
     }
 
-    public Nodo _agrega(Nodo nodo, Integer valor) {
+    public Nodo _agrega(Nodo nodo, Integer valor, int profundidad) {
         Random r = new Random();
         if (nodo == null) {
 //            System.out.println("a");
@@ -70,7 +70,6 @@ public class ArbolAleatorio1 {
             return nodo;
         }
         if (nodo.getIzquierdo() == null && nodo.getDerecho() == null) {
-//            System.out.println("b");
             if (r.nextBoolean()) {
                 nodo.setDerecho(new Nodo(valor));
                 return nodo;
@@ -78,22 +77,19 @@ public class ArbolAleatorio1 {
             nodo.setIzquierdo(new Nodo(valor));
             return nodo;
         } else if (nodo.getDerecho() != null && nodo.getIzquierdo() == null) {
-//            System.out.println("c");
             nodo.setIzquierdo(new Nodo(valor));
             return nodo;
         } else if (nodo.getIzquierdo() != null && nodo.getIzquierdo() == null) {
-//            System.out.println("d");
             nodo.setDerecho(new Nodo(valor));
             return nodo;
         } else {
-//            System.out.println("e");
             if (r.nextBoolean()) {
-                Nodo nuevo = _agrega(nodo.getDerecho(), valor);
+                Nodo nuevo = _agrega(nodo.getDerecho(), valor, profundidad + 1);
                 nodo.setDerecho(nuevo);
                 return nodo;
             }
-            Nodo nuevo = _agrega(nodo.getIzquierdo(), valor);
-            nodo.setIzquierdo(nodo);
+            Nodo nuevo = _agrega(nodo.getIzquierdo(), valor, profundidad + 1);
+            nodo.setIzquierdo(nuevo);
             return nodo;
         }
 
@@ -101,13 +97,11 @@ public class ArbolAleatorio1 {
 
     public String inorden(Nodo nodo, Integer profundidad) {
         if (nodo != null) {
-            System.out.println("Valor: " + nodo.getValor() + " profundidad: " + profundidad);
             String izquierda = inorden(nodo.getIzquierdo(), profundidad + 1);
-            System.out.println("Izquierdo");
             String valor = nodo.getValor().toString();
             String derecha = inorden(nodo.getDerecho(), profundidad + 1);
             String profundidadTabs = String.join("", Collections.nCopies(profundidad, "\t"));
-            return String.format("%s\n%s%s\n%s", izquierda, profundidadTabs, valor, derecha);
+            return String.format("%s\n%s%s\n%s\n", izquierda, profundidadTabs, valor, derecha);
         } else {
             return "";
         }
