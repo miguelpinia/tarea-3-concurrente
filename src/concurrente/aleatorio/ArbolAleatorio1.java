@@ -1,7 +1,9 @@
 package concurrente.aleatorio;
 
 import concurrente.Nodo;
+import concurrente.Utils;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -78,16 +80,15 @@ public class ArbolAleatorio1 {
     }
 
     public static void main(String[] args) {
-        Integer[] foo = {10, 20, 30, 50, 1, 2, 3, 4, 100, 200, 300, 400};
+        List<Integer> datos = Utils.obtenDatos("/tmp/datos.txt");
         ArbolAleatorio1 a = new ArbolAleatorio1();
-        Integer[] datos = a.generaDatos();
-        for (int i = 0; i < datos.length; i++) {
-            System.out.print(datos[i] + " ");
-        }
-        for (Integer val : foo) { // Intercambiar foo por datos
+        long milis = System.currentTimeMillis();
+        for (Integer val : datos) {
             a.agrega(val);
         }
+        milis = System.currentTimeMillis() - milis;
         System.out.println(a);
+        System.out.println(String.format("\n\nTiempo de ejeución: %d ms", milis));
     }
 
 }

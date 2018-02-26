@@ -1,9 +1,8 @@
 package concurrente.aleatorio;
 
 import concurrente.Nodo;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static concurrente.Utils.obtenDatos;
 
 /**
  *
@@ -21,13 +22,29 @@ public class ArbolAleatorio2 {
     private final ReentrantLock _lock = new ReentrantLock();
     private Nodo _raiz;
 
+    /**
+     * Agrega un valor al árbol.
+     *
+     * @param valor El valor a agregar.
+     */
     public void agrega(Integer valor) {
         _lock.lock();
-        _raiz = _agrega(_raiz, valor, 0);
-        _lock.unlock();
+        try {
+            _raiz = _agrega(_raiz, valor);
+        } finally {
+            _lock.unlock();
+        }
     }
 
-    private Nodo _agrega(Nodo nodo, Integer valor, int profundidad) {
+    /**
+     * Función auxiliar para agregar valor VALOR al árbol definido por el nodo
+     * NODO.
+     *
+     * @param nodo El nodo raíz.
+     * @param valor EL valor a agregar.
+     * @return EL nodo con el valor agregado.
+     */
+    private Nodo _agrega(Nodo nodo, Integer valor) {
         Random r = new Random();
         if (nodo == null) {
             nodo = new Nodo(valor);
@@ -48,18 +65,27 @@ public class ArbolAleatorio2 {
             return nodo;
         } else {
             if (r.nextBoolean()) {
-                Nodo nuevo = _agrega(nodo.getDerecho(), valor, profundidad + 1);
+                Nodo nuevo = _agrega(nodo.getDerecho(), valor);
                 nodo.setDerecho(nuevo);
                 return nodo;
             }
-            Nodo nuevo = _agrega(nodo.getIzquierdo(), valor, profundidad + 1);
+            Nodo nuevo = _agrega(nodo.getIzquierdo(), valor);
             nodo.setIzquierdo(nuevo);
             return nodo;
         }
 
     }
 
-    public String inorden(Nodo nodo, Integer profundidad) {
+    /**
+     * Guarda en una cadena el recorrido en Inorden sobre el nodo Nodo, así como
+     * indicar la profundidad del nodo.
+     *
+     * @param nodo EL nodo sobre el que se va a realizar el recorrido en
+     * Inorden.
+     * @param profundidad La profundidad a la que se encuentra el nodo.
+     * @return La cadena con la representación del recorrido en Inorden.
+     */
+    private String inorden(Nodo nodo, Integer profundidad) {
         if (nodo != null) {
             String izquierda = inorden(nodo.getIzquierdo(), profundidad + 1);
             String valor = nodo.getValor().toString();
@@ -71,36 +97,38 @@ public class ArbolAleatorio2 {
         }
     }
 
+    @Override
     public String toString() {
         return inorden(_raiz, 0);
-    }
-
-    public ArrayList<Integer> generaDatos() {
-        ArrayList<Integer> datos = new ArrayList<>();
-        Random r = new Random();
-        for (int i = 0; i < 10000; i++) {
-            datos.add(r.nextInt(1000000000));
-        }
-        return datos;
     }
 
     public static void main(String[] args) {
         try {
             ExecutorService executor = Executors.newFixedThreadPool(6);
+            ReentrantLock lock = new ReentrantLock();
             ArbolAleatorio2 a = new ArbolAleatorio2();
-            ArrayList<Integer> foo = new ArrayList<>(Arrays.asList(new Integer[]{10, 20, 30, 50, 1, 2, 3, 4, 100, 200, 300, 400}));
-            int size = foo.size();
+            List<Integer> datos = obtenDatos("/tmp/datos.txt");
+            System.out.println("Datos leídos");
             Random r = new Random();
-//            ArrayList<Integer> foo = a.generaDatos();
-//            int size = foo.size();
-            while (!foo.isEmpty()) {
+            long milis = System.currentTimeMillis();
+            while (!datos.isEmpty()) {
                 executor.submit(() -> {
-                    if (!foo.isEmpty()) {
-                        int random = r.nextInt(size);
-                        int aleatorio = foo.get(random % size);
-                        foo.remove(random % size);
+                    Integer aleatorio = null;
+                    lock.lock();
+                    try {
+                        int size = datos.size();
+                        int random = r.nextInt(datos.size());
+                        if (!datos.isEmpty()) {
+                            aleatorio = datos.remove(random);
+
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+                    if (aleatorio != null) {
                         a.agrega(aleatorio);
                     }
+
                 });
             }
 
@@ -108,7 +136,9 @@ public class ArbolAleatorio2 {
             executor.awaitTermination(10, TimeUnit.SECONDS);
 
             if (executor.isShutdown()) {
+                milis = System.currentTimeMillis() - milis - 10000;
                 System.out.println(a);
+                System.out.println(String.format("\n\nTiempo de ejeución: %d ms", milis));
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(ArbolAleatorio2.class.getName()).log(Level.SEVERE, null, ex);
