@@ -5,8 +5,8 @@
  */
 package concurrente;
 
-import concurrente.aleatorio.ArbolAleatorio2;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -54,18 +54,38 @@ public class Utils {
             }
             return datos;
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ArbolAleatorio2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ArbolAleatorio2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 fr.close();
             } catch (IOException ex) {
-                Logger.getLogger(ArbolAleatorio2.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return null;
     }
+
+    public static void escribe(String archivo, String data) {
+        FileWriter fw = null;
+        try {
+            File f = new File(archivo);
+            fw = new FileWriter(f);
+            try (BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.write(data);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fw.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
 
     /**
      * @param args the command line arguments

@@ -1,16 +1,18 @@
 package concurrente.aleatorio;
 
-import concurrente.Nodo;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static concurrente.Utils.escribe;
 import static concurrente.Utils.obtenDatos;
 
 /**
@@ -103,47 +105,35 @@ public class ArbolAleatorio2 {
     }
 
     public static void main(String[] args) {
-        try {
-            ExecutorService executor = Executors.newFixedThreadPool(6);
-            ReentrantLock lock = new ReentrantLock();
-            ArbolAleatorio2 a = new ArbolAleatorio2();
-            List<Integer> datos = obtenDatos("/tmp/datos.txt");
-            System.out.println("Datos leídos");
-            Random r = new Random();
-            long milis = System.currentTimeMillis();
-            while (!datos.isEmpty()) {
-                executor.submit(() -> {
-                    Integer aleatorio = null;
-                    lock.lock();
-                    try {
-                        int size = datos.size();
-                        int random = r.nextInt(datos.size());
-                        if (!datos.isEmpty()) {
-                            aleatorio = datos.remove(random);
-
-                        }
-                    } finally {
-                        lock.unlock();
-                    }
-                    if (aleatorio != null) {
-                        a.agrega(aleatorio);
-                    }
-
-                });
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Ejecución de algoritmo aleatorio de 6 hilos.");
+        ExecutorService executor = Executors.newFixedThreadPool(6);
+        ArbolAleatorio2 a = new ArbolAleatorio2();
+        System.out.println("Leyend datos");
+        List<Integer> datos = obtenDatos("/tmp/datos.txt");
+        System.out.println("# datos leídos: " + datos.size());
+        List<Future<Runnable>> futures = new ArrayList<>();
+        long milis = System.currentTimeMillis();
+        datos.forEach((dato) -> {
+            Future f = executor.submit(() -> {
+                a.agrega(dato);
+            });
+            futures.add(f);
+        });
+        futures.forEach((f) -> {
+            try {
+                f.get();
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(ArbolAleatorio2.class.getName()).log(Level.SEVERE, null, ex);
             }
+        });
+        executor.shutdownNow();
 
-            executor.shutdown();
-            executor.awaitTermination(10, TimeUnit.SECONDS);
-
-            if (executor.isShutdown()) {
-                milis = System.currentTimeMillis() - milis - 10000;
-                System.out.println(a);
-                System.out.println(String.format("\n\nTiempo de ejeución: %d ms", milis));
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ArbolAleatorio2.class.getName()).log(Level.SEVERE, null, ex);
+        if (executor.isShutdown()) {
+            milis = System.currentTimeMillis() - milis;
+            escribe("/tmp/aleatorio2.txt", a.toString());
+            System.out.println(String.format("\n\nTiempo de ejeución: %d milisegundos", milis));
         }
-
     }
 
 }

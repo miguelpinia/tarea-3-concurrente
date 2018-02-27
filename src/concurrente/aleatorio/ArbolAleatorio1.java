@@ -1,10 +1,11 @@
 package concurrente.aleatorio;
 
-import concurrente.Nodo;
 import concurrente.Utils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static concurrente.Utils.escribe;
 
 /**
  *
@@ -12,7 +13,7 @@ import java.util.Random;
  */
 public class ArbolAleatorio1 {
 
-    Nodo _raiz;
+    private Nodo _raiz;
 
     public ArbolAleatorio1() {
         _raiz = null;
@@ -54,7 +55,7 @@ public class ArbolAleatorio1 {
 
     }
 
-    public String inorden(Nodo nodo, Integer profundidad) {
+    private String inorden(Nodo nodo, Integer profundidad) {
         if (nodo != null) {
             String izquierda = inorden(nodo.getIzquierdo(), profundidad + 1);
             String valor = nodo.getValor().toString();
@@ -70,25 +71,21 @@ public class ArbolAleatorio1 {
         return inorden(_raiz, 0);
     }
 
-    public Integer[] generaDatos() {
-        Integer[] datos = new Integer[100];
-        Random r = new Random();
-        for (int i = 0; i < 100; i++) {
-            datos[i] = r.nextInt(1000000);
-        }
-        return datos;
-    }
-
     public static void main(String[] args) {
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Ejecución de algoritmo aleatorio de 1 hilo.");
+        System.out.println("Leyendo datos");
         List<Integer> datos = Utils.obtenDatos("/tmp/datos.txt");
+        System.out.println("# datos leídos: " + datos.size());
         ArbolAleatorio1 a = new ArbolAleatorio1();
         long milis = System.currentTimeMillis();
-        for (Integer val : datos) {
+        datos.forEach((val) -> {
             a.agrega(val);
-        }
+        });
         milis = System.currentTimeMillis() - milis;
-        System.out.println(a);
-        System.out.println(String.format("\n\nTiempo de ejeución: %d ms", milis));
+        double segundos = milis / 1000;
+        escribe("/tmp/aleatorio1.txt", a.toString());
+        System.out.println(String.format("\n\nTiempo de ejeución: %d milisegundos", milis));
     }
 
 }
