@@ -39,7 +39,7 @@ public class ArbolAleatorio1 {
         } else if (nodo.getDerecho() != null && nodo.getIzquierdo() == null) {
             nodo.setIzquierdo(new Nodo(valor));
             return nodo;
-        } else if (nodo.getIzquierdo() != null && nodo.getIzquierdo() == null) {
+        } else if (nodo.getIzquierdo() != null && nodo.getDerecho() == null) {
             nodo.setDerecho(new Nodo(valor));
             return nodo;
         } else {
