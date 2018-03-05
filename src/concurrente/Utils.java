@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,7 +60,9 @@ public class Utils {
             Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fr.close();
+                if (fr != null) {
+                    fr.close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -79,7 +82,9 @@ public class Utils {
             Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fw.close();
+                if (fw != null) {
+                    fw.close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -93,15 +98,20 @@ public class Utils {
     public static void main(String[] args) {
         FileWriter fw = null;
         try {
-            File f = new File("/tmp/datos.txt");
+            Scanner sc = new Scanner(System.in);
+            String salida = "/tmp/datos.txt";
+            File f = new File(salida);
             fw = new FileWriter(f);
-            List<Integer> permutacion = generaPermutacion(100000);
+            System.out.println("Indica el número de datos a generar: ");
+            int tamaño = sc.nextInt();
+            List<Integer> permutacion = generaPermutacion(tamaño);
             // TODO code application logic here
             try (PrintWriter out = new PrintWriter(fw)) {
                 for (int i = 0; i < permutacion.size(); i++) {
                     out.println(permutacion.get(i));
                 }
             }
+            System.out.println(String.format("Se generó la salida en %s", salida));
         } catch (IOException ex) {
             Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
